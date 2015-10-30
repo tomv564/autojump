@@ -12,6 +12,9 @@ from autojump_argparse import ArgumentParser
 
 SUPPORTED_SHELLS = ('bash', 'zsh', 'fish', 'tcsh')
 
+is_cywin = (os.getenv('TERM') and (os.getenv('TERM') == 'cygwin'))
+is_windows = (platform.system() == 'Windows' and not is_cywin)
+
 
 def cp(src, dest, dryrun=False):
     print("copying file: %s -> %s" % (src, dest))
@@ -54,7 +57,7 @@ def modify_autojump_lua(clink_dir, bin_dir, dryrun=False):
 
 
 def parse_arguments():  # noqa
-    if platform.system() == 'Windows':
+    if is_windows and not is_cywin:
         default_user_destdir = os.path.join(
             os.getenv('LOCALAPPDATA', ''),
             'autojump')
@@ -101,7 +104,7 @@ def parse_arguments():  # noqa
             print("Python v2.6+ or v3.0+ required.", file=sys.stderr)
             sys.exit(1)
         if args.system:
-            if platform.system() == 'Windows':
+            if is_windows:
                 print("System-wide installation is not supported on Windows.",
                       file=sys.stderr)
                 sys.exit(1)
@@ -137,7 +140,7 @@ def parse_arguments():  # noqa
 
 
 def show_post_installation_message(etc_dir, share_dir, bin_dir):
-    if platform.system() == 'Windows':
+    if is_windows and not is_cywin:
         print("\nPlease manually add %s to your user path" % bin_dir)
     else:
         if get_shell() == 'fish':
@@ -185,7 +188,7 @@ def main(args):
     cp('./bin/icon.png', share_dir, args.dryrun)
     cp('./docs/autojump.1', doc_dir, args.dryrun)
 
-    if platform.system() == 'Windows':
+    if is_windows and not is_cywin:
         cp('./bin/autojump.lua', args.clinkdir, args.dryrun)
         cp('./bin/autojump.bat', bin_dir, args.dryrun)
         cp('./bin/j.bat', bin_dir, args.dryrun)

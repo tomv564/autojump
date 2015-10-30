@@ -52,6 +52,7 @@ from autojump_utils import has_uppercase
 from autojump_utils import is_autojump_sourced
 from autojump_utils import is_osx
 from autojump_utils import is_windows
+from autojump_utils import is_cygwin
 from autojump_utils import last
 from autojump_utils import print_entry
 from autojump_utils import print_local
@@ -75,9 +76,16 @@ def set_defaults():
             'Library',
             'autojump')
     elif is_windows():
-        data_home = os.path.join(
-            os.getenv('APPDATA'),
-            'autojump')
+        if is_cygwin():
+            data_home = os.path.join(
+                os.path.expanduser('~'),
+                        '.local',
+                        'share',
+                        'autojump')
+        else:
+            data_home = os.path.join(
+                os.getenv('APPDATA'),
+                '.autojump')
     else:
         data_home = os.getenv(
             'XDG_DATA_HOME',
@@ -351,7 +359,7 @@ def print_stats(data, data_path):
 
 
 def main(args):  # noqa
-    if not is_autojump_sourced() and not is_windows():
+    if not is_autojump_sourced() and not (is_windows() and not is_cygwin()):
         print("Please source the correct autojump file in your shell's")
         print("startup file. For more information, please reinstall autojump")
         print("and read the post installation instructions.")

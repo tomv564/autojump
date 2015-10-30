@@ -112,6 +112,9 @@ def is_osx():
 def is_windows():
     return platform.system() == 'Windows'
 
+def is_cygwin():
+    return os.getenv('TERM') == 'cygwin'
+
 
 def last(xs):
     it = iter(xs)
